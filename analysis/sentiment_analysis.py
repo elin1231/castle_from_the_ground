@@ -102,16 +102,19 @@ columns = ["ticker", "date", "time", "headline"]
 parsed_and_scored_news = pd.DataFrame(parsed_news, columns=columns)
 
 # Iterate through the headlines and get the polarity scores using vader
-scores = parsed_and_scored_news["headline"].apply(vader.polarity_scores).tolist()
+scores = parsed_and_scored_news["headline"].apply(
+    vader.polarity_scores).tolist()
 
 # Convert the 'scores' list of dicts into a DataFrame
 scores_df = pd.DataFrame(scores)
 
 # Join the DataFrames of the news and the list of dicts
-parsed_and_scored_news = parsed_and_scored_news.join(scores_df, rsuffix="_right")
+parsed_and_scored_news = parsed_and_scored_news.join(
+    scores_df, rsuffix="_right")
 
 # Convert the date column from string to datetime
-parsed_and_scored_news["date"] = pd.to_datetime(parsed_and_scored_news.date).dt.date
+parsed_and_scored_news["date"] = pd.to_datetime(
+    parsed_and_scored_news.date).dt.date
 
 parsed_and_scored_news.head()
 
