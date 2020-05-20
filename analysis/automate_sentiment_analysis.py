@@ -1,3 +1,4 @@
+# %%
 from urllib.request import urlopen, Request
 from bs4 import BeautifulSoup
 import os
@@ -28,9 +29,9 @@ for ticker in tickers:
     if DEBUG_FLAG:
         print("Scrapping ticker: {}".format(ticker))
     # print(news_table)
-
+# %%
 for ticker in tickers:
-    current_company = news_table[ticker]
+    current_company = news_tables[ticker]
     current_company_tr = current_company.findAll("tr")
 
     for i, table_row in enumerate(current_company_tr):
@@ -69,7 +70,7 @@ for ticker in tickers:
 
             # Append ticker, date, time and headline as a list to the 'parsed_news' list
             parsed_news.append([ticker, date, time, text])
-
+# %%
 for ticker in tickers:
     vader = SentimentIntensityAnalyzer()
     # Set column names
@@ -79,19 +80,16 @@ for ticker in tickers:
     parsed_and_scored_news = pd.DataFrame(parsed_news, columns=columns)
 
     # Iterate through the headlines and get the polarity scores using vader
-    scores = parsed_and_scored_news["headline"].apply(
-        vader.polarity_scores).tolist()
+    scores = parsed_and_scored_news["headline"].apply(vader.polarity_scores).tolist()
 
     # Convert the 'scores' list of dicts into a DataFrame
     scores_df = pd.DataFrame(scores)
 
     # Join the DataFrames of the news and the list of dicts
-    parsed_and_scored_news = parsed_and_scored_news.join(
-        scores_df, rsuffix="_right")
+    parsed_and_scored_news = parsed_and_scored_news.join(scores_df, rsuffix="_right")
 
     # Convert the date column from string to datetime
-    parsed_and_scored_news["date"] = pd.to_datetime(
-        parsed_and_scored_news.date).dt.date
+    parsed_and_scored_news["date"] = pd.to_datetime(parsed_and_scored_news.date).dt.date
 
     parsed_and_scored_news.head()
 
@@ -99,3 +97,6 @@ for ticker in tickers:
     parsed_and_scored_news.to_csv(
         "../output/sentiment_scored_{}.csv".format(ticker), index=False, header=True
     )
+
+
+# %%
