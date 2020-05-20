@@ -7,23 +7,19 @@ import matplotlib.pyplot as plt
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import csv
 from urllib.error import HTTPError
-from multiprocessing import Pool
+from multiprocessing import Pool, Manager
 
 
 DEBUG_FLAG = True
 
 
 def web_scrap(tickers):
-    finviz_url = "https://finviz.com/quote.ashx?t="
-    news_tables = {}
-
     for ticker in tickers:
         url = finviz_url + ticker
         if DEBUG_FLAG:
             print("URL: {}".format(url))
         try:
-            req = Request(url=url, headers={
-                "user-agent": "my-app/0.0.1"})
+            req = Request(url=url, headers={"user-agent": "my-app/0.0.1"})
             response = urlopen(req, timeout=15)
             # Read the contents of the file into 'html'
             html = BeautifulSoup(response, features="lxml")
@@ -35,9 +31,11 @@ def web_scrap(tickers):
         # Add the table to our dictionary
         news_tables[ticker] = news_table
 
-        if DEBUG_FLAG:
-            print("Scrapping ticker: {}".format(ticker))
-        # print(news_table)
+
+def parse(tickers):
+    # if DEBUG_FLAG:
+    #     print("Scrapping ticker: {}".format(ticker))
+    # print(news_table)
     # %%
     for ticker in tickers:
         try:
@@ -60,7 +58,7 @@ def web_scrap(tickers):
 
         parsed_news = []
 
-    # Iterate through the news
+        # Iterate through the news
         for file_name, news_table in news_tables.items():
             # Iterate through all tr tags in 'news_table'
             for x in news_table.findAll("tr"):
@@ -96,19 +94,22 @@ def sentiment_analyze():
         parsed_and_scored_news = pd.DataFrame(parsed_news, columns=columns)
 
         # Iterate through the headlines and get the polarity scores using vader
-        scores = parsed_and_scored_news["headline"].apply(
-            vader.polarity_scores).tolist()
+        scores = (
+            parsed_and_scored_news["headline"].apply(vader.polarity_scores).tolist()
+        )
 
         # Convert the 'scores' list of dicts into a DataFrame
         scores_df = pd.DataFrame(scores)
 
         # Join the DataFrames of the news and the list of dicts
         parsed_and_scored_news = parsed_and_scored_news.join(
-            scores_df, rsuffix="_right")
+            scores_df, rsuffix="_right"
+        )
 
         # Convert the date column from string to datetime
         parsed_and_scored_news["date"] = pd.to_datetime(
-            parsed_and_scored_news.date).dt.date
+            parsed_and_scored_news.date
+        ).dt.date
 
         parsed_and_scored_news.head()
 
@@ -122,8 +123,14 @@ def sentiment_analyze():
 # work in progress have to rewrite so that the function returns records, and could be pieced together
 company_info = pd.read_csv("../output/tickerList.csv")
 tickers = company_info["TICKER"].tolist()
-with Pool(12) as p:
-    p.map(web_scrap(tickers))
+
+manager = Manager()
+news_tables = manager.dict()
+finviz_url = "https://finviz.com/quote.ashx?t="
 
 with Pool(12) as p:
-    p.sentiment_analyze(tickers)
+    p.map(web_scrap, tickers)
+
+print(news_tables)
+# with Pool(12) as p:
+#     p.sentiment_analyze(tickers)
