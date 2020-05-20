@@ -6,6 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import csv
+from urllib.error import HTTPError
 
 DEBUG_FLAG = True
 
@@ -17,8 +18,13 @@ tickers = company_info["TICKER"]
 
 for ticker in tickers:
     url = finviz_url + ticker
+    if DEBUG_FLAG:
+        print("URL: {}".format(url))
     req = Request(url=url, headers={"user-agent": "my-app/0.0.1"})
-    response = urlopen(req)
+    try:
+        response = urlopen(req)
+    except Exception:
+        continue
     # Read the contents of the file into 'html'
     html = BeautifulSoup(response, features="lxml")
     # Find 'news-table' in the Soup and load it into 'news_table'
@@ -31,8 +37,11 @@ for ticker in tickers:
     # print(news_table)
 # %%
 for ticker in tickers:
-    current_company = news_tables[ticker]
-    current_company_tr = current_company.findAll("tr")
+    try:
+        current_company = news_tables[ticker]
+        current_company_tr = current_company.findAll("tr")
+    except Exception:
+        break
 
     for i, table_row in enumerate(current_company_tr):
         # Read the text of the element 'a' into 'link_text'
