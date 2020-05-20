@@ -6,8 +6,9 @@ import matplotlib.pyplot as plt
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import csv
 
-finviz_url = "https://finviz.com/quote.ashx?t="
+DEBUG_FLAG = True
 
+finviz_url = "https://finviz.com/quote.ashx?t="
 news_tables = {}
 
 company_info = pd.read_csv("../output/tickerList.csv")
@@ -23,6 +24,9 @@ for ticker in tickers:
     news_table = html.find(id="news-table")
     # Add the table to our dictionary
     news_tables[ticker] = news_table
+
+    if DEBUG_FLAG:
+        print("Scrapping ticker: {}".format(ticker))
     # print(news_table)
 
 for ticker in tickers:
@@ -66,6 +70,7 @@ for ticker in tickers:
             # Append ticker, date, time and headline as a list to the 'parsed_news' list
             parsed_news.append([ticker, date, time, text])
 
+for ticker in tickers:
     vader = SentimentIntensityAnalyzer()
     # Set column names
     columns = ["ticker", "date", "time", "headline"]
@@ -74,16 +79,19 @@ for ticker in tickers:
     parsed_and_scored_news = pd.DataFrame(parsed_news, columns=columns)
 
     # Iterate through the headlines and get the polarity scores using vader
-    scores = parsed_and_scored_news["headline"].apply(vader.polarity_scores).tolist()
+    scores = parsed_and_scored_news["headline"].apply(
+        vader.polarity_scores).tolist()
 
     # Convert the 'scores' list of dicts into a DataFrame
     scores_df = pd.DataFrame(scores)
 
     # Join the DataFrames of the news and the list of dicts
-    parsed_and_scored_news = parsed_and_scored_news.join(scores_df, rsuffix="_right")
+    parsed_and_scored_news = parsed_and_scored_news.join(
+        scores_df, rsuffix="_right")
 
     # Convert the date column from string to datetime
-    parsed_and_scored_news["date"] = pd.to_datetime(parsed_and_scored_news.date).dt.date
+    parsed_and_scored_news["date"] = pd.to_datetime(
+        parsed_and_scored_news.date).dt.date
 
     parsed_and_scored_news.head()
 
