@@ -14,19 +14,21 @@ finviz_url = "https://finviz.com/quote.ashx?t="
 news_tables = {}
 
 company_info = pd.read_csv("../output/tickerList.csv")
-tickers = company_info["TICKER"]
+tickers = company_info["TICKER"].tolist()
 
 for ticker in tickers:
     url = finviz_url + ticker
     if DEBUG_FLAG:
         print("URL: {}".format(url))
-    req = Request(url=url, headers={"user-agent": "my-app/0.0.1"})
     try:
-        response = urlopen(req)
+        req = Request(url=url, headers={
+                      "user-agent": "my-app/0.0.1"})
+        response = urlopen(req, timeout=15)
+        # Read the contents of the file into 'html'
+        html = BeautifulSoup(response, features="lxml")
     except Exception:
         continue
-    # Read the contents of the file into 'html'
-    html = BeautifulSoup(response, features="lxml")
+
     # Find 'news-table' in the Soup and load it into 'news_table'
     news_table = html.find(id="news-table")
     # Add the table to our dictionary
@@ -89,16 +91,19 @@ for ticker in tickers:
     parsed_and_scored_news = pd.DataFrame(parsed_news, columns=columns)
 
     # Iterate through the headlines and get the polarity scores using vader
-    scores = parsed_and_scored_news["headline"].apply(vader.polarity_scores).tolist()
+    scores = parsed_and_scored_news["headline"].apply(
+        vader.polarity_scores).tolist()
 
     # Convert the 'scores' list of dicts into a DataFrame
     scores_df = pd.DataFrame(scores)
 
     # Join the DataFrames of the news and the list of dicts
-    parsed_and_scored_news = parsed_and_scored_news.join(scores_df, rsuffix="_right")
+    parsed_and_scored_news = parsed_and_scored_news.join(
+        scores_df, rsuffix="_right")
 
     # Convert the date column from string to datetime
-    parsed_and_scored_news["date"] = pd.to_datetime(parsed_and_scored_news.date).dt.date
+    parsed_and_scored_news["date"] = pd.to_datetime(
+        parsed_and_scored_news.date).dt.date
 
     parsed_and_scored_news.head()
 
