@@ -55,7 +55,10 @@ def generate_sentiment(ticker):
     parsed_news = []
     # Iterate through the news
     for file_name, news_table in news_tables.items():
+        parsed_news.clear()
         # Iterate through all tr tags in 'news_table'
+        if not news_table:
+            return
         for x in news_table.findAll("tr"):
             # read the text from each tr tag into text
             # get text from a only
@@ -76,6 +79,7 @@ def generate_sentiment(ticker):
 
             # Append ticker, date, time and headline as a list to the 'parsed_news' list
             parsed_news.append([ticker, date, time, text])
+
     # %%
     vader = SentimentIntensityAnalyzer()
     # Set column names
@@ -110,5 +114,5 @@ if __name__ == "__main__":
 
     company_info = pd.read_csv("../output/tickerList.csv")
     tickers = company_info["TICKER"].tolist()
-    with Pool(10) as p:
+    with Pool(4) as p:
         p.map(generate_sentiment, tickers)
