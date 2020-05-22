@@ -8,6 +8,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import csv
 from urllib.error import HTTPError
 from multiprocessing import Pool, Manager
+import shutil
 
 
 DEBUG_FLAG = True
@@ -81,7 +82,6 @@ def generate_sentiment(ticker):
             parsed_news.append([ticker, date, time, text])
 
     # %%
-    vader = SentimentIntensityAnalyzer()
     # Set column names
     columns = ["ticker", "date", "time", "headline"]
 
@@ -104,15 +104,17 @@ def generate_sentiment(ticker):
 
     # This needs to be changed later
     parsed_and_scored_news.to_csv(
-        "../output/sentiment_scored_{}.csv".format(ticker), index=False, header=True
+        "../output/headline_sentiment/sentiment_scored_{}.csv".format(ticker),
+        index=False,
+        header=True,
     )
 
 
 if __name__ == "__main__":
     finviz_url = "https://finviz.com/quote.ashx?t="
     news_tables = {}
-
+    vader = SentimentIntensityAnalyzer()
     company_info = pd.read_csv("../output/tickerList.csv")
     tickers = company_info["TICKER"].tolist()
-    with Pool(4) as p:
+    with Pool(10) as p:
         p.map(generate_sentiment, tickers)
