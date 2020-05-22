@@ -1,4 +1,4 @@
 
 .DS_Store
-*.xml
-*.iml
+machine_learning/parse/LoughranMcDonald_MasterDictionary_2018.csv
+*.csv
