@@ -104,7 +104,7 @@ def generate_sentiment(ticker):
 
     # This needs to be changed later
     parsed_and_scored_news.to_csv(
-        "../output/headline_sentiment/sentiment_scored_{}.csv".format(ticker),
+        "./output/headline_sentiment/sentiment_scored_{}.csv".format(ticker),
         index=False,
         header=True,
     )
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     finviz_url = "https://finviz.com/quote.ashx?t="
     news_tables = {}
     vader = SentimentIntensityAnalyzer()
-    company_info = pd.read_csv("../output/tickerList.csv")
+    company_info = pd.read_csv("./output/tickerList.csv")
     tickers = company_info["TICKER"].tolist()
     with Pool(10) as p:
         p.map(generate_sentiment, tickers)
