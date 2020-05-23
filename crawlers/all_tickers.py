@@ -15,7 +15,7 @@ def get_tickers(percent):
     """Keep the top percent market-cap companies."""
     assert isinstance(percent, int)
 
-    file = open("../output/tickerList.csv", "w")
+    file = open("./output/tickerList.csv", "w")
     writer = csv.writer(file, delimiter=",")
     writer.writerow(["TICKER", "NAME", "EXCHANGE", "MARKET_CAP"])
 
