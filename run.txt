@@ -1,0 +1,4 @@
+1. Navigate to root directory
+2. python crawlers/all_tickers.py (Integer indicating top {}% company we want the tickers of
+3. DOESN'T WORK ON PC, mac: sudo python analysis/multiprocess_test.py
+4. MAKE SURE THIS COMMAND RUNS: python crawlers/key_data_scrapper.py
