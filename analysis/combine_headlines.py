@@ -27,7 +27,10 @@ def parse_file(company_sentimenet_file):
             parsed_dictionary[date][1]
         )
     df = pd.DataFrame.from_dict(parsed_dictionary, orient="index")
-    df.to_csv("./output/sentiment_processed/{}.csv".format(data_list[0][0]))
+    df.columns = ("TICKER", "COMPOUND", "UPDATED")
+    df.to_csv(
+        "./output/sentiment_processed/{}.csv".format(data_list[0][0]), header=True
+    )
 
 
 if __name__ == "__main__":
