@@ -31,18 +31,6 @@ class Yahoo_Data_Scrapper:
                 index=False,
             )
 
-            # getting historical data date/open/high/low/close/adj_close/volume
-            yf.pdr_override()
-            ticker_historical_df = pdr.get_data_yahoo(
-                ticker,
-                start=ticker_news_df.iloc[update_list[len(update_list) - 1], 0],
-                end=ticker_news_df.iloc[update_list[0], 0],
-            )
-            ticker_historical_df = ticker_historical_df.reindex(
-                index=ticker_historical_df.index[::-1]
-            )
-            s = pd.Series(range(len(ticker_historical_df)))
-
             # getting info data from yf
             if "T" not in ticker_news_df.iloc[:, 3]:  # if ticker has been run before
                 try:
