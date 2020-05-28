@@ -118,3 +118,4 @@ if __name__ == "__main__":
     tickers = company_info["TICKER"].tolist()
     with Pool(10) as p:
         p.map(generate_sentiment, tickers)
+    # run()

@@ -7,3 +7,6 @@
 /lib
 /venv
 /bin
+*.cfg
+analysis/combine_headlines(2).py
+analysis/__pycache__/combine_headlines.cpython-37.pyc
