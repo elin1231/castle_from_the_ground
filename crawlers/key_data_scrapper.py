@@ -1,3 +1,4 @@
+#%%
 import os
 import datetime
 from pandas_datareader import data as pdr
@@ -39,10 +40,10 @@ class Yahoo_Data_Scrapper:
                     ticker_info_df = pd.DataFrame.from_dict(
                         ticker_info_dict, orient="index"
                     ).T
-                    pd.concat([ticker_info_df] * len(update_list))
+                    # pd.concat([ticker_info_df] * len(update_list))
                     ### add other df
                     ticker_training_set = pd.concat(
-                        [ticker_news_df, ticker_historical_df, ticker_info_df], axis=1
+                        [ticker_news_df, ticker_info_df], axis=1
                     )
                     ticker_training_set.to_csv(
                         "./output/training_set/" + ticker + ".csv",
@@ -54,9 +55,9 @@ class Yahoo_Data_Scrapper:
 
                 # else: # if ticker hasn't been run before
                 ### add df except for info
-                ticker_training_set = pd.concat(
-                    [ticker_news_df, ticker_info_df], axis=1
-                )
+                # ticker_training_set = pd.concat(
+                #     [ticker_news_df, ticker_info_df], axis=1
+                # )
 
 
 def create_ticker_list():
@@ -73,7 +74,7 @@ def create_ticker_list():
 # 2) fix index for concat
 # 3) fetch historical data
 
-
+#%%
 if __name__ == "__main__":
     ticker_list = create_ticker_list()
     yahoo_data_scrapper = Yahoo_Data_Scrapper(ticker_list)
