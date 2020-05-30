@@ -2,6 +2,7 @@ from pandas_datareader import data as pdr
 import pandas as pd
 import os
 import yfinance as yf
+import numpy as np
 
 
 historial_data_path = "./output/historical_data"
@@ -37,11 +38,9 @@ def add_general_info(df, ticker):
         if column not in df.columns:
             try:
                 company_info = yf.Ticker(ticker).info
-                if company_info[column]:
-                    df[column] = company_info[column]
-                else:
-                    df[column] = "NA"
+                df[column] = company_info[column]
             except:
+                df[column] = np.nan
                 print("Failed: {}".format(ticker))
                 continue
 
